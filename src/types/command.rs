@@ -74,7 +74,7 @@ pub(crate) struct Ask {
     pub(crate) msg_type: String,
 }
 
-//used for Event subscribtion
+//used for Event subscription
 #[derive(Debug, Serialize, PartialEq)]
 pub(crate) struct Subscribe {
     pub(crate) id: Option<u64>,

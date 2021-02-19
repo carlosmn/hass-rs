@@ -36,7 +36,7 @@ pub enum HassError {
     UnknownPayloadReceived,
 
     /// Returned the error received from the Home Assistant Gateway
-    ReponseError(WSResult),
+    ResponseError(WSResult),
 
     /// Returned for errors which do not fit any of the above criterias
     Generic(String),
@@ -59,7 +59,7 @@ impl fmt::Display for HassError {
             Self::TungsteniteError(e) => write!(f, "Tungstenite Error: {}", e),
             Self::ChannelSend(e) => write!(f, "Channel Send Error: {}", e),
             Self::UnknownPayloadReceived => write!(f, "The received payload is unknown"),
-            Self::ReponseError(e) => write!(
+            Self::ResponseError(e) => write!(
                 f,
                 "The error code:{} with the error message: {}",
                 e.error.as_ref().unwrap().code,

@@ -16,9 +16,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut client = client::connect("localhost", 8123).await?;
 
     client.auth_with_longlivedtoken(&*TOKEN).await?;
-    println!("WebSocket connection and authethication works");
+    println!("WebSocket connection and authentication works");
 
-    //Is the callback definition usefull as it is?..or need to return anything
+    //Is the callback definition useful as it is?..or need to return anything
     // in order to further process the result, like call for a service
     println!("Subscribe to an Event");
 
@@ -38,7 +38,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Unsubscribe the Event");
 
     match client.unsubscribe_event(2).await {
-        Ok(v) => println!("Succefully unsubscribed: {}", v),
+        Ok(v) => println!("Successfully unsubscribed: {}", v),
         Err(err) => println!("Oh no, an error: {}", err),
     }
 

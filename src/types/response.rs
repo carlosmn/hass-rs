@@ -8,11 +8,11 @@ use serde_json::Value;
 #[derive(Debug, Deserialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub(crate) enum Response {
-    //request to autheticate
+    //request to authenticate
     AuthRequired(AuthRequired),
-    //authetication suceeded
+    //authentication succeeded
     AuthOk(AuthOk),
-    //authetication failed
+    //authentication failed
     AuthInvalid(AuthInvalid),
     //general response from server
     Result(WSResult),
@@ -25,7 +25,7 @@ pub(crate) enum Response {
 }
 
 // this is the first message received from websocket,
-// that ask to provide a authetication method
+// that ask to provide a authentication method
 #[derive(Debug, Deserialize, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub(crate) struct AuthRequired {
@@ -34,7 +34,7 @@ pub(crate) struct AuthRequired {
     pub(crate) ha_version: String,
 }
 
-// this is received when the service successfully autheticate
+// this is received when the service successfully authenticate
 #[derive(Debug, Deserialize, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub(crate) struct AuthOk {
@@ -43,7 +43,7 @@ pub(crate) struct AuthOk {
     pub(crate) ha_version: String,
 }
 
-// this is received if the authetication failed
+// this is received if the authentication failed
 #[derive(Debug, Deserialize, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub(crate) struct AuthInvalid {
@@ -72,10 +72,10 @@ pub struct WSEvent {
     pub event: HassEvent,
 }
 
-///this is the general response from the Websocket server when a requesthas been sent
+///this is the general response from the Websocket server when a request has been sent
 ///
 /// if "success" is true, then the "result" can be checked
-/// if "suceess" is false, then the "error" should be further explored
+/// if "success" is false, then the "error" should be further explored
 #[derive(Debug, Deserialize, PartialEq)]
 pub struct WSResult {
     pub(crate) id: u64,

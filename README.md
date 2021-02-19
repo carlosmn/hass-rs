@@ -41,7 +41,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut client = client::connect("localhost", 8123).await?;
 
     client.auth_with_longlivedtoken(&*TOKEN).await?;
-    println!("WebSocket connection and authethication works");
+    println!("WebSocket connection and authentication works");
 
     println!("Get Hass Config");
     match client.get_config().await {
@@ -99,7 +99,7 @@ $ docker run -d --name="home-assistant" -v /PATH_TO_YOUR_CONFIG:/config -v /etc/
     - [x] Fetching states
     - [x] Fetching config
     - [x] Fetching services
-    - [ ] Fetching pannels (you need this?, raise an Issue)
+    - [ ] Fetching panels (you need this?, raise an Issue)
     - [ ] Fetching media player thumbnails (you need this?, raise an Issue)
 - [x] Ping - Pong
 

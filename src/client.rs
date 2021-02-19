@@ -48,7 +48,7 @@ impl HassClient {
     /// async fn main() -> Result<(), Box<dyn std::error::Error>>{
     ///     let mut client = client::connect("localhost", 8123).await?;
     ///     client.auth_with_longlivedtoken("your_token").await?;
-    ///     println!("WebSocket connection and authethication works");
+    ///     println!("WebSocket connection and authentication works");
     ///     Ok(())
     /// }
     /// ```
@@ -68,7 +68,7 @@ impl HassClient {
         });
         let response = self.gateway.command(auth_req).await?;
 
-        //Check if the authetication was succefully, should receive {"type": "auth_ok"}
+        //Check if the authentication was successfully, should receive {"type": "auth_ok"}
         match response {
             Response::AuthOk(_) => Ok(()),
             Response::AuthInvalid(err) => return Err(HassError::AuthenticationFailed(err.message)),
@@ -117,7 +117,7 @@ impl HassClient {
         //Check the response, if the Pong was received
         match response {
             Response::Pong(_v) => Ok("pong".to_owned()),
-            Response::Result(err) => return Err(HassError::ReponseError(err)),
+            Response::Result(err) => return Err(HassError::ResponseError(err)),
             _ => return Err(HassError::UnknownPayloadReceived),
         }
     }
@@ -181,7 +181,7 @@ impl HassClient {
     ///
     /// //assuming the event subscription is present
     ///     match client.unsubscribe_event(2).await {
-    ///         Ok(v) => println!("Succefully unsubscribed: {}", v),
+    ///         Ok(v) => println!("Successfully unsubscribed: {}", v),
     ///         Err(err) => println!("Oh no, an error: {}", err),
     ///     }
     ///     Ok(())
@@ -231,7 +231,7 @@ impl HassClient {
                     )?;
                     return Ok(config);
                 }
-                false => return Err(HassError::ReponseError(data)),
+                false => return Err(HassError::ResponseError(data)),
             },
             _ => return Err(HassError::UnknownPayloadReceived),
         }
@@ -276,7 +276,7 @@ impl HassClient {
                         serde_json::from_value(data.result.expect("Expecting to get the States"))?;
                     return Ok(states);
                 }
-                false => return Err(HassError::ReponseError(data)),
+                false => return Err(HassError::ResponseError(data)),
             },
             _ => return Err(HassError::UnknownPayloadReceived),
         }
@@ -322,7 +322,7 @@ impl HassClient {
                     )?;
                     return Ok(services);
                 }
-                false => return Err(HassError::ReponseError(data)),
+                false => return Err(HassError::ResponseError(data)),
             },
             _ => return Err(HassError::UnknownPayloadReceived),
         }
@@ -387,7 +387,7 @@ impl HassClient {
         match response {
             Response::Result(data) => match data.success {
                 true => return Ok("command executed successfully".to_owned()),
-                false => return Err(HassError::ReponseError(data)),
+                false => return Err(HassError::ResponseError(data)),
             },
             _ => return Err(HassError::UnknownPayloadReceived),
         }

@@ -37,7 +37,7 @@
 //!
 //! // Authenticate the session
 //!     client.auth_with_longlivedtoken(&*TOKEN).await?;
-//!     println!("WebSocket connection and authethication works");
+//!     println!("WebSocket connection and authentication works");
 //!
 //! // Fetch the Home Assistant Config
 //!     println!("Get Hass Config");

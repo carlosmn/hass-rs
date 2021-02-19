@@ -17,7 +17,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut client = client::connect("localhost", 8123).await?;
 
     client.auth_with_longlivedtoken(&*TOKEN).await?;
-    println!("WebSocket connection and authethication works");
+    println!("WebSocket connection and authentication works");
 
     println!("Sending a Ping command and waiting for Pong");
 

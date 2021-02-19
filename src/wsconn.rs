@@ -18,7 +18,7 @@ use std::sync::{
 use url;
 
 pub struct WsConn {
-    //message sequence required by the Websocket server, I may need this field on recconect
+    //message sequence required by the Websocket server, I may need this field on reconnect
     //last_sequence: Arc<AtomicU64>,
 
     //Client --> Gateway (send "Commands" msg to the Gateway)
@@ -38,7 +38,7 @@ impl WsConn {
         let wsclient = connect_async(url).await.expect("Can't connect to gateway");
         let (sink, stream) = wsclient.split();
 
-        //Channels to recieve the Client Command and send it over to the Websocket server
+        //Channels to receive the Client Command and send it over to the Websocket server
         let (to_gateway, from_client) = channel::<Command>(20);
 
         //Channels to receive the Response from the Websocket server and send it over to the Client
@@ -70,7 +70,7 @@ impl WsConn {
         })
     }
 
-    //used to send commands and receive responses from the gasteway
+    //used to send commands and receive responses from the gateway
     pub(crate) async fn command(&mut self, cmd: Command) -> HassResult<Response> {
         // Send the auth command to gateway
         self.to_gateway
@@ -85,7 +85,7 @@ impl WsConn {
             .ok_or_else(|| HassError::ConnectionClosed)?
     }
 
-    //used to subscribe to the event and if the subscribtion succeded the callback is registered
+    //used to subscribe to the event and if the subscription succeeded the callback is registered
     pub(crate) async fn subscribe_message<F>(
         &mut self,
         event_name: &str,
@@ -104,14 +104,14 @@ impl WsConn {
         //send command to subscribe to specific event
         let response = self.command(cmd).await.unwrap();
 
-        //Add the callback in the event_listeners hashmap if the Subscription Response is successfull
+        //Add the callback in the event_listeners hashmap if the Subscription Response is successful
         match response {
             Response::Result(v) if v.success == true => {
                 let mut table = self.event_listeners.lock().await;
                 table.insert(v.id, Box::new(callback));
                 return Ok("Ok".to_owned());
             }
-            Response::Result(v) if v.success == false => return Err(HassError::ReponseError(v)),
+            Response::Result(v) if v.success == false => return Err(HassError::ResponseError(v)),
             _ => return Err(HassError::UnknownPayloadReceived),
         }
     }
@@ -128,7 +128,7 @@ impl WsConn {
         //send command to unsubscribe from specific event
         let response = self.command(unsubscribe_req).await.unwrap();
 
-        //Remove the event_type and the callback fromthe event_listeners hashmap
+        //Remove the event_type and the callback from the event_listeners hashmap
         match response {
             Response::Result(v) if v.success == true => {
                 let mut table = self.event_listeners.lock().await;
@@ -137,7 +137,7 @@ impl WsConn {
                 }
                 return Err(HassError::Generic("Wrong subscription ID".to_owned()));
             }
-            Response::Result(v) if v.success == false => return Err(HassError::ReponseError(v)),
+            Response::Result(v) if v.success == false => return Err(HassError::ResponseError(v)),
             _ => return Err(HassError::UnknownPayloadReceived),
         }
     }
@@ -264,7 +264,7 @@ async fn sender_loop(
     Ok(())
 }
 
-//listen for gateway responses and either send to client the response or execute the defined closure for Event subscribtion
+//listen for gateway responses and either send to client the response or execute the defined closure for Event subscription
 async fn receiver_loop(
     //    last_sequence: Arc<AtomicU64>,
     mut stream: SplitStream<WebSocket>,
