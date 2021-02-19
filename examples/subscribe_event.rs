@@ -31,16 +31,19 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         item.event.time_fired );
     };
 
-    match client.subscribe_event("state_changed", pet).await {
+    let event_id = client.subscribe_event("state_changed", pet).await;
+    match &event_id {
         Ok(v) => println!("Event subscribed: {}", v),
         Err(err) => println!("Oh no, an error: {}", err),
     }
+
+    let event_id = event_id?;
 
     async_std::task::sleep(std::time::Duration::from_secs(20)).await;
 
     println!("Unsubscribe the Event");
 
-    match client.unsubscribe_event(2).await {
+    match client.unsubscribe_event(event_id).await {
         Ok(v) => println!("Successfully unsubscribed: {}", v),
         Err(err) => println!("Oh no, an error: {}", err),
     }

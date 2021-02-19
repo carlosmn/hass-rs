@@ -156,7 +156,7 @@ impl HassClient {
     ///     Ok(())
     /// }
     /// ```
-    pub async fn subscribe_event<F>(&mut self, event_name: &str, callback: F) -> HassResult<String>
+    pub async fn subscribe_event<F>(&mut self, event_name: &str, callback: F) -> HassResult<u64>
     where
         F: Fn(WSEvent) + Send + 'static,
     {

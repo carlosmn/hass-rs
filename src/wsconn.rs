@@ -85,12 +85,14 @@ impl WsConn {
             .ok_or_else(|| HassError::ConnectionClosed)?
     }
 
-    //used to subscribe to the event and if the subscription succeeded the callback is registered
+    /// used to subscribe to the event and if the subscription succeeded the callback is registered
+    ///
+    /// returns the event id
     pub(crate) async fn subscribe_message<F>(
         &mut self,
         event_name: &str,
         callback: F,
-    ) -> HassResult<String>
+    ) -> HassResult<u64>
     where
         F: Fn(WSEvent) + Send + 'static,
     {
@@ -102,17 +104,17 @@ impl WsConn {
         });
 
         //send command to subscribe to specific event
-        let response = self.command(cmd).await.unwrap();
+        let response = self.command(cmd).await?;
 
         //Add the callback in the event_listeners hashmap if the Subscription Response is successful
         match response {
             Response::Result(v) if v.success == true => {
                 let mut table = self.event_listeners.lock().await;
                 table.insert(v.id, Box::new(callback));
-                return Ok("Ok".to_owned());
+                Ok(v.id)
             }
-            Response::Result(v) if v.success == false => return Err(HassError::ResponseError(v)),
-            _ => return Err(HassError::UnknownPayloadReceived),
+            Response::Result(v) if v.success == false => Err(HassError::ResponseError(v)),
+            _ => Err(HassError::UnknownPayloadReceived),
         }
     }
 
