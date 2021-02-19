@@ -23,8 +23,9 @@ pub struct HassClient {
 }
 
 /// establish the websocket connection to Home Assistant server
-pub async fn connect(host: &str, port: u16) -> HassResult<HassClient> {
-    let addr = format!("ws://{}:{}/api/websocket", host, port);
+pub async fn connect(host: &str, port: u16, with_tls: bool) -> HassResult<HassClient> {
+    let protocol = if with_tls { "wss" } else { "ws" };
+    let addr = format!("{}://{}:{}/api/websocket", protocol, host, port);
     let url = url::Url::parse(&addr)?;
     let gateway = WsConn::connect(url).await?;
     Ok(HassClient { gateway })
@@ -46,7 +47,7 @@ impl HassClient {
     ///
     /// #[async_std::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>>{
-    ///     let mut client = client::connect("localhost", 8123).await?;
+    ///     let mut client = client::connect("localhost", 8123, false).await?;
     ///     client.auth_with_longlivedtoken("your_token").await?;
     ///     println!("WebSocket connection and authentication works");
     ///     Ok(())
@@ -94,7 +95,7 @@ impl HassClient {
     /// #[async_std::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///
-    ///     let mut client = client::connect("localhost", 8123).await?;
+    ///     let mut client = client::connect("localhost", 8123, false).await?;
     ///     client.auth_with_longlivedtoken("your_token").await?;
     ///
     ///     match client.ping().await? {
@@ -140,7 +141,7 @@ impl HassClient {
     /// #[async_std::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///
-    ///     let mut client = client::connect("localhost", 8123).await?;
+    ///     let mut client = client::connect("localhost", 8123, false).await?;
     ///     client.auth_with_longlivedtoken("your_token").await?;
     ///
     ///     let pet = |item: WSEvent| {
@@ -176,7 +177,7 @@ impl HassClient {
     /// #[async_std::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///
-    ///     let mut client = client::connect("localhost", 8123).await?;
+    ///     let mut client = client::connect("localhost", 8123, false).await?;
     ///     client.auth_with_longlivedtoken("your_token").await?;
     ///
     /// //assuming the event subscription is present
@@ -204,7 +205,7 @@ impl HassClient {
     /// #[async_std::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///
-    ///     let mut client = client::connect("localhost", 8123).await?;
+    ///     let mut client = client::connect("localhost", 8123, false).await?;
     ///     client.auth_with_longlivedtoken("your_token").await?;
     ///
     ///     println!("Get Hass Config");
@@ -250,7 +251,7 @@ impl HassClient {
     /// #[async_std::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>>{
     ///
-    ///     let mut client = client::connect("localhost", 8123).await?;
+    ///     let mut client = client::connect("localhost", 8123, false).await?;
     ///     client.auth_with_longlivedtoken("your_token").await?;
     ///
     ///     println!("Get Hass States");
@@ -295,7 +296,7 @@ impl HassClient {
     /// #[async_std::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///
-    ///     let mut client = client::connect("localhost", 8123).await?;
+    ///     let mut client = client::connect("localhost", 8123, false).await?;
     ///     client.auth_with_longlivedtoken("your_token").await?;
     ///
     ///     println!("Get Hass Services");
@@ -344,7 +345,7 @@ impl HassClient {
     /// #[async_std::main]
     /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
     ///
-    ///     let mut client = client::connect("localhost", 8123).await?;
+    ///     let mut client = client::connect("localhost", 8123, false).await?;
     ///     client.auth_with_longlivedtoken("your_token").await?;
     ///
     ///     let value = json!({

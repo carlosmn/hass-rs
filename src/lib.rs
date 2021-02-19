@@ -33,7 +33,7 @@
 //! async fn main() -> Result<(), Box<dyn std::error::Error>> {
 //!
 //! // Create the websocket client and connect to gateway
-//!     let mut client = client::connect("localhost", 8123).await?;
+//!     let mut client = client::connect("localhost", 8123, false).await?;
 //!
 //! // Authenticate the session
 //!     client.auth_with_longlivedtoken(&*TOKEN).await?;

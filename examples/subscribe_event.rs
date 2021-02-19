@@ -13,7 +13,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::init();
 
     println!("Creating the Websocket Client and Authenticate the session");
-    let mut client = client::connect("localhost", 8123).await?;
+    let mut client = client::connect("localhost", 8123, false).await?;
 
     client.auth_with_longlivedtoken(&*TOKEN).await?;
     println!("WebSocket connection and authentication works");
