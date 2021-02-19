@@ -6,6 +6,9 @@ use std::env::var;
 lazy_static! {
     static ref TOKEN: String =
         var("HASS_TOKEN").expect("please set up the HASS_TOKEN env variable before running this");
+
+    static ref HOST: String = var("HASS_HOST").unwrap_or_else(|_| "localhost".to_string());
+    static ref PORT: u16 = var("HASS_PORT").ok().and_then(|p| p.parse().ok()).unwrap_or(8123);
 }
 
 #[cfg_attr(feature = "async-std-runtime", async_std::main)]
@@ -13,7 +16,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::init();
 
     println!("Creating the Websocket Client and Authenticate the session");
-    let mut client = client::connect("localhost", 8123, false).await?;
+    let mut client = client::connect(&*HOST, *PORT, *PORT == 443).await?;
 
     client.auth_with_longlivedtoken(&*TOKEN).await?;
     println!("WebSocket connection and authentication works");
