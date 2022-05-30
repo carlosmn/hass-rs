@@ -162,105 +162,104 @@ async fn sender_loop(
     task::spawn(async move {
         //Fuse the stream such that poll_next will never again be called once it has finished.
         let mut fused = from_client.fuse();
-        loop {
-            match fused.next().await {
-                Some(item) => match item {
-                    Command::Close => {
-                        return sink
-                            .send(TungsteniteMessage::Close(None))
-                            .await
-                            .map_err(|_| HassError::ConnectionClosed);
+        while let Some(item) = fused.next().await {
+            match item {
+                Command::Close => {
+                    return sink
+                        .send(TungsteniteMessage::Close(None))
+                        .await
+                        .map_err(|_| HassError::ConnectionClosed);
+                }
+                Command::AuthInit(auth) => {
+                    // Transform command to TungsteniteMessage
+                    let cmd = Command::AuthInit(auth).to_tungstenite_message();
+
+                    // Send the message to gateway
+                    if let Err(e) = sink.send(cmd).await {
+                        return Err(HassError::from(e));
                     }
-                    Command::AuthInit(auth) => {
-                        // Transform command to TungsteniteMessage
-                        let cmd = Command::AuthInit(auth).to_tungstenite_message();
+                }
+                Command::Ping(mut ping) => {
+                    ping.id = get_last_seq(&last_sequence);
 
-                        // Send the message to gateway
-                        if let Err(e) = sink.send(cmd).await {
-                            return Err(HassError::from(e));
-                        }
+                    // Transform command to TungsteniteMessage
+                    let cmd = Command::Ping(ping).to_tungstenite_message();
+
+                    // Send the message to gateway
+                    if let Err(e) = sink.send(cmd).await {
+                        return Err(HassError::from(e));
                     }
-                    Command::Ping(mut ping) => {
-                        ping.id = get_last_seq(&last_sequence);
+                }
+                Command::SubscribeEvent(mut subscribe) => {
+                    subscribe.id = get_last_seq(&last_sequence);
 
-                        // Transform command to TungsteniteMessage
-                        let cmd = Command::Ping(ping).to_tungstenite_message();
+                    // Transform command to TungsteniteMessage
+                    let cmd = Command::SubscribeEvent(subscribe).to_tungstenite_message();
 
-                        // Send the message to gateway
-                        if let Err(e) = sink.send(cmd).await {
-                            return Err(HassError::from(e));
-                        }
+                    // Send the message to gateway
+                    if let Err(e) = sink.send(cmd).await {
+                        return Err(HassError::from(e));
                     }
-                    Command::SubscribeEvent(mut subscribe) => {
-                        subscribe.id = get_last_seq(&last_sequence);
+                }
+                Command::Unsubscribe(mut unsubscribe) => {
+                    unsubscribe.id = get_last_seq(&last_sequence);
 
-                        // Transform command to TungsteniteMessage
-                        let cmd = Command::SubscribeEvent(subscribe).to_tungstenite_message();
+                    // Transform command to TungsteniteMessage
+                    let cmd = Command::Unsubscribe(unsubscribe).to_tungstenite_message();
 
-                        // Send the message to gateway
-                        if let Err(e) = sink.send(cmd).await {
-                            return Err(HassError::from(e));
-                        }
+                    // Send the message to gateway
+                    if let Err(e) = sink.send(cmd).await {
+                        return Err(HassError::from(e));
                     }
-                    Command::Unsubscribe(mut unsubscribe) => {
-                        unsubscribe.id = get_last_seq(&last_sequence);
+                }
+                Command::GetConfig(mut getconfig) => {
+                    getconfig.id = get_last_seq(&last_sequence);
 
-                        // Transform command to TungsteniteMessage
-                        let cmd = Command::Unsubscribe(unsubscribe).to_tungstenite_message();
+                    // Transform command to TungsteniteMessage
+                    let cmd = Command::GetConfig(getconfig).to_tungstenite_message();
 
-                        // Send the message to gateway
-                        if let Err(e) = sink.send(cmd).await {
-                            return Err(HassError::from(e));
-                        }
+                    // Send the message to gateway
+                    if let Err(e) = sink.send(cmd).await {
+                        return Err(HassError::from(e));
                     }
-                    Command::GetConfig(mut getconfig) => {
-                        getconfig.id = get_last_seq(&last_sequence);
+                }
+                Command::GetStates(mut getstates) => {
+                    getstates.id = get_last_seq(&last_sequence);
 
-                        // Transform command to TungsteniteMessage
-                        let cmd = Command::GetConfig(getconfig).to_tungstenite_message();
+                    // Transform command to TungsteniteMessage
+                    let cmd = Command::GetStates(getstates).to_tungstenite_message();
 
-                        // Send the message to gateway
-                        if let Err(e) = sink.send(cmd).await {
-                            return Err(HassError::from(e));
-                        }
+                    // Send the message to gateway
+                    if let Err(e) = sink.send(cmd).await {
+                        return Err(HassError::from(e));
                     }
-                    Command::GetStates(mut getstates) => {
-                        getstates.id = get_last_seq(&last_sequence);
+                }
+                Command::GetServices(mut getservices) => {
+                    getservices.id = get_last_seq(&last_sequence);
 
-                        // Transform command to TungsteniteMessage
-                        let cmd = Command::GetStates(getstates).to_tungstenite_message();
+                    // Transform command to TungsteniteMessage
+                    let cmd = Command::GetServices(getservices).to_tungstenite_message();
 
-                        // Send the message to gateway
-                        if let Err(e) = sink.send(cmd).await {
-                            return Err(HassError::from(e));
-                        }
+                    // Send the message to gateway
+                    if let Err(e) = sink.send(cmd).await {
+                        return Err(HassError::from(e));
                     }
-                    Command::GetServices(mut getservices) => {
-                        getservices.id = get_last_seq(&last_sequence);
+                }
+                Command::CallService(mut callservice) => {
+                    callservice.id = get_last_seq(&last_sequence);
 
-                        // Transform command to TungsteniteMessage
-                        let cmd = Command::GetServices(getservices).to_tungstenite_message();
+                    // Transform command to TungsteniteMessage
+                    let cmd = Command::CallService(callservice).to_tungstenite_message();
 
-                        // Send the message to gateway
-                        if let Err(e) = sink.send(cmd).await {
-                            return Err(HassError::from(e));
-                        }
+                    // Send the message to gateway
+                    if let Err(e) = sink.send(cmd).await {
+                        return Err(HassError::from(e));
                     }
-                    Command::CallService(mut callservice) => {
-                        callservice.id = get_last_seq(&last_sequence);
-
-                        // Transform command to TungsteniteMessage
-                        let cmd = Command::CallService(callservice).to_tungstenite_message();
-
-                        // Send the message to gateway
-                        if let Err(e) = sink.send(cmd).await {
-                            return Err(HassError::from(e));
-                        }
-                    }
-                },
-                None => {}
+                }
             }
         }
+
+        Ok(())
     });
 
     Ok(())
@@ -274,9 +273,9 @@ async fn receiver_loop(
     event_listeners: Arc<Mutex<HashMap<u64, Box<dyn Fn(WSEvent) + Send>>>>,
 ) -> HassResult<()> {
     task::spawn(async move {
-        loop {
-            match stream.next().await {
-                Some(Ok(item)) => match item {
+        while let Some(msg) = stream.next().await {
+            match msg {
+                Ok(item) => match item {
                     TungsteniteMessage::Text(data) => {
                         // info!("{}", data);
 
@@ -307,12 +306,11 @@ async fn receiver_loop(
                     _ => {}
                 },
 
-                Some(Err(error)) => match to_client.send(Err(HassError::from(&error))).await {
+                Err(error) => match to_client.send(Err(HassError::from(&error))).await {
                     //send the error to client ("unexpected message format, like a new error")
                     Ok(_r) => {}
                     Err(_e) => {}
                 },
-                None => {}
             }
         }
     });
